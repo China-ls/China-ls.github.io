@@ -1,0 +1,985 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Angularjs,AngularjsDirective,百度地图," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="China-ls" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本文核心内容
+由于AngularJs并不主动去管理Baidu地图对象，所以我封装了一个AngularJs使用百度地图的指令，具体指令实现的内容如下：
+
+指令自动获取Baidu地图脚本
+绑定地图事件(地图点击、地图加载完成、地图拖动 等事件)
+注入百度地图引用到Controller中
+可配置绑定到当前scope的InfoWindow
+可在Controller中通过操作百度地图引用来添加标注等(这里的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Angular 百度地图指令">
+<meta property="og:url" content="https://china-ls.github.io/2017/01/19/angular-baidumap/index.html">
+<meta property="og:site_name" content="China-ls">
+<meta property="og:description" content="本文核心内容
+由于AngularJs并不主动去管理Baidu地图对象，所以我封装了一个AngularJs使用百度地图的指令，具体指令实现的内容如下：
+
+指令自动获取Baidu地图脚本
+绑定地图事件(地图点击、地图加载完成、地图拖动 等事件)
+注入百度地图引用到Controller中
+可配置绑定到当前scope的InfoWindow
+可在Controller中通过操作百度地图引用来添加标注等(这里的">
+<meta property="og:updated_time" content="2017-02-09T01:57:45.931Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Angular 百度地图指令">
+<meta name="twitter:description" content="本文核心内容
+由于AngularJs并不主动去管理Baidu地图对象，所以我封装了一个AngularJs使用百度地图的指令，具体指令实现的内容如下：
+
+指令自动获取Baidu地图脚本
+绑定地图事件(地图点击、地图加载完成、地图拖动 等事件)
+注入百度地图引用到Controller中
+可配置绑定到当前scope的InfoWindow
+可在Controller中通过操作百度地图引用来添加标注等(这里的">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '6372010932884735000',
+      author: 'China-ls'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"未查到响应的结果: ${query}","hits_stats":"${hits} 结果，用时 ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://china-ls.github.io/2017/01/19/angular-baidumap/"/>
+
+
+
+
+
+  <title> Angular 百度地图指令 | China-ls </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?06d15990b678b657d9584f0f598f80e0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">China-ls</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">科技改变世界，世界改变我们，我们推动科技变革。呀，是个循环呀，能否使用Break?</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://china-ls.github.io/2017/01/19/angular-baidumap/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="China-ls">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/assets/img/avatar.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="China-ls">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="China-ls" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Angular 百度地图指令
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-19T11:35:18+08:00">
+                2017-01-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Angularjs/" itemprop="url" rel="index">
+                    <span itemprop="name">Angularjs</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/01/19/angular-baidumap/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/01/19/angular-baidumap/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="本文核心内容"><a href="#本文核心内容" class="headerlink" title="本文核心内容"></a>本文核心内容</h3><blockquote>
+<p><strong>由于AngularJs并不主动去管理Baidu地图对象，所以我封装了一个AngularJs使用百度地图的指令，具体指令实现的内容如下：</strong></p>
+<ul>
+<li><font color="#f40">指令自动获取Baidu地图脚本</font></li>
+<li><font color="#f40">绑定地图事件(<strong>地图点击、地图加载完成、地图拖动 等事件</strong>)</font></li>
+<li><font color="#f40">注入百度地图引用到Controller中</font></li>
+<li><font color="#f40">可配置绑定到当前scope的InfoWindow</font></li>
+<li><font color="#f40">可在Controller中通过操作百度地图引用来添加标注等(<strong>这里的百度地图引用就是官方的JS对象，所以我们之间通过官方API操作即可。</strong>)</font>
+
+</li>
+</ul>
+</blockquote>
+<h3 id="GitHub地址"><a href="#GitHub地址" class="headerlink" title="GitHub地址"></a><a href="https://github.com/China-ls/angular-baidu-maps" target="_blank" rel="external">GitHub地址</a></h3><h3 id="Demo预览"><a href="#Demo预览" class="headerlink" title="Demo预览"></a>Demo预览</h3><p>在命令行中执行以下命令<br><figure class="highlight cmd"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">npm install</div><div class="line">bower install</div></pre></td></tr></table></figure></p>
+<p>在浏览器中查看demo.html</p>
+<h3 id="修改源码后编译"><a href="#修改源码后编译" class="headerlink" title="修改源码后编译"></a>修改源码后编译</h3><p>源码在src目录下angularjs-baidu-maps.js，可在修改源码后运行如下命令，在dist目录生成angularjs-baidu-maps.min.js<br><figure class="highlight cmd"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">grunt uglify</div></pre></td></tr></table></figure></p>
+<h3 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h3><p>详细具体使用方式请参考 demo.html demo.js demo.css中内容</p>
+<h3 id="js引入"><a href="#js引入" class="headerlink" title="js引入"></a>js引入</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"bower_components/angular/angular.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"dist/angularjs-baidu-maps.min.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div></pre></td></tr></table></figure>
+<h3 id="基本配置"><a href="#基本配置" class="headerlink" title="基本配置"></a>基本配置</h3><p>js中对百度地图配置，通过一个对象mapOpts<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">angular.module(<span class="string">'app'</span>, [<span class="string">'ls.bmap'</span>])</div><div class="line">    .controller(<span class="string">'DemoCtrl'</span>, [<span class="string">'$scope'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">$scope</span>) </span>&#123;</div><div class="line">        $scope.mapOpts = &#123;</div><div class="line">            <span class="attr">apiKey</span>: <span class="string">'替换成你的key'</span>,</div><div class="line">            <span class="attr">center</span>: &#123;<span class="attr">longitude</span>: <span class="number">121.595871</span>,<span class="attr">latitude</span>: <span class="number">31.187017</span>&#125;,</div><div class="line">            <span class="attr">zoom</span>: <span class="number">17</span>,</div><div class="line">            <span class="attr">enableScrollWheelZoom</span>: <span class="literal">true</span>,</div><div class="line">            <span class="attr">enableMapClick</span>: <span class="literal">false</span>,</div><div class="line">            <span class="attr">onMapLoadFild</span>: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">                <span class="comment">//百度地图加载失败</span></div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">    &#125;]);</div></pre></td></tr></table></figure></p>
+<p>说明：</p>
+<ul>
+<li>mapOpts 百度地图配置对象，名称与html中map-options=”mapOpts”一致</li>
+<li>apiKey 百度地图控制台申请的key，<a href="http://lbsyun.baidu.com/apiconsole/key/create" target="_blank" rel="external">百度地图KEY申请</a></li>
+<li>center 初始化地图中心点</li>
+<li>zoom   初始化地图缩放级别</li>
+<li>enableScrollWheelZoom   是否允许鼠标控制地图缩放</li>
+<li>enableScrollWheelZoom   是否允许地图默认点击事件(true表示基本标注可以点击)</li>
+<li>onMapLoadFild  当地图加载失败回调</li>
+</ul>
+<p>html模版中，配置如下<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"map"</span> <span class="attr">style</span>=<span class="string">"height:500px;"</span></span></div><div class="line">     <span class="attr">ui-baidu-map</span>=<span class="string">"myMap"</span></div><div class="line">     <span class="attr">map-event</span>=<span class="string">"&#123;'map-click': 'onMapClick($event, $params)', 'map-loaded': 'onMapLoaded($event, $params)'&#125;"</span></div><div class="line">     <span class="attr">map-options</span>=<span class="string">"mapOpts"</span>&gt;</div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>说明：</p>
+<ul>
+<li>myMap是Controller中百度地图的引用，就是BMap.Map对象，我们可以使用百度地图提供的方法操作它。myMap可以换成任何值，这里只需要与上面controller中名称一致即可</li>
+<li>map-event指令中是描述百度地图的各种事件(地图点击、地图加载完成等等，可以到官方去查<a href="http://lbsyun.baidu.com/cms/jsapi/reference/jsapi_reference.html#a0b0" target="_blank" rel="external">地图参考</a>，配置方式相同，在事件前加’map-‘，参数都是($event,$params)，$event包含地图事件的信息，$params是这个事件的参数列表(数组)</li>
+<li>map-options就是我们配置百度地图的对象名称，可以修改为任何值，与controller中保持一致</li>
+</ul>
+<h3 id="信息窗体配置"><a href="#信息窗体配置" class="headerlink" title="信息窗体配置"></a>信息窗体配置</h3><p>controller中配置信息窗体回调事件<br><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">angular.module(<span class="string">'app'</span>, [<span class="string">'ls.bmap'</span>])</div><div class="line">    .controller(<span class="string">'DemoCtrl'</span>, [<span class="string">'$scope'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">$scope</span>) </span>&#123;</div><div class="line">        <span class="comment">// ... 省略其他配置</span></div><div class="line">        $scope.onInfoWindowClick = <span class="function"><span class="keyword">function</span> (<span class="params">marker</span>) </span>&#123;</div><div class="line">            <span class="comment">// 信息窗体内部，按钮点击事件，与angularjs事件绑定方式相同</span></div><div class="line">        &#125;;</div><div class="line"></div><div class="line">        $scope.onInfoWindowClickClose = <span class="function"><span class="keyword">function</span>(<span class="params">$event, $params</span>) </span>&#123;</div><div class="line">            <span class="comment">//点击信息窗体关闭按钮 回调，右上角百度地图关闭信息窗体点击时出发。</span></div><div class="line">        &#125;;</div><div class="line"></div><div class="line">        $scope.onInfoWindowClose = <span class="function"><span class="keyword">function</span>(<span class="params">$event, $params</span>) </span>&#123;</div><div class="line">            <span class="comment">//信息窗体关闭 回调，信息窗体关闭时触发</span></div><div class="line">        &#125;;</div><div class="line">    &#125;]);</div></pre></td></tr></table></figure></p>
+<p>html模版中<em>信息窗体</em>配置(示例)，实际使用中，只需要把需要当作信息窗体的html段落加上ui-baidu-map-info-window指令即可<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">ui-baidu-map-info-window</span>=<span class="string">"myInfoWindow"</span></span></div><div class="line">     <span class="attr">info-window-event</span>=<span class="string">"&#123;'close' : 'onInfoWindowClose($event, $params)','clickclose' : 'onInfoWindowClickClose($event, $params)'&#125;"</span>&gt;</div><div class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"m-b-sm"</span>&gt;</span>标注<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">form</span> <span class="attr">role</span>=<span class="string">"form"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"form-group"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">"lat"</span>&gt;</span>Lat:<span class="tag">&lt;/<span class="name">label</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">input</span> <span class="attr">id</span>=<span class="string">"lat"</span> <span class="attr">ng-model</span>=<span class="string">"currentMarker.point.lat"</span> <span class="attr">class</span>=<span class="string">"form-control input-sm w-sm m-l-lg"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"form-group"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">"lng"</span>&gt;</span>Lng:<span class="tag">&lt;/<span class="name">label</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">input</span> <span class="attr">id</span>=<span class="string">"lng"</span> <span class="attr">ng-model</span>=<span class="string">"currentMarker.point.lng"</span> <span class="attr">class</span>=<span class="string">"form-control input-sm w-sm m-l-lg"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">"btn btn-success btn-sm m-l-lg m-b-sm"</span> <span class="attr">ng-click</span>=<span class="string">"onInfoWindowClick(currentMarker)"</span>&gt;</span>点我试试<span class="tag">&lt;/<span class="name">a</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">form</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>说明：</p>
+<ul>
+<li>ui-baidu-map-info-window=”myInfoWindow”配置controller中操作InfoWindow的引用名称，可以替换为任何值</li>
+<li>info-window-event配置方式与地图事件相同，不同之处在于这里不需要加前缀</li>
+<li>ui-baidu-map-info-window指令所包含的所有内容都被当作InfoWindow的内容</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>如果您觉得这篇文章帮助了您，并且值得打赏的话，请鼓励一下，谢谢！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="/assets/img/wx.jpg" alt="China-ls WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="/assets/img/alipay.png" alt="China-ls Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Angularjs/" rel="tag"># Angularjs</a>
+          
+            <a href="/tags/AngularjsDirective/" rel="tag"># AngularjsDirective</a>
+          
+            <a href="/tags/百度地图/" rel="tag"># 百度地图</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/19/alipaycard2017/" rel="next" title="支付宝福卡增强卡">
+                <i class="fa fa-chevron-left"></i> 支付宝福卡增强卡
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2017/01/19/angular-baidumap/"
+     data-title="Angular 百度地图指令"
+     data-content=""
+     data-url="https://china-ls.github.io/2017/01/19/angular-baidumap/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/01/19/angular-baidumap/"
+           data-title="Angular 百度地图指令" data-url="https://china-ls.github.io/2017/01/19/angular-baidumap/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/assets/img/avatar.jpg"
+               alt="China-ls" />
+          <p class="site-author-name" itemprop="name">China-ls</p>
+          <p class="site-description motion-element" itemprop="description">欢迎关注，不断更新中。</p>
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/China-ls" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#本文核心内容"><span class="nav-text">本文核心内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GitHub地址"><span class="nav-text">GitHub地址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Demo预览"><span class="nav-text">Demo预览</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改源码后编译"><span class="nav-text">修改源码后编译</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用方式"><span class="nav-text">使用方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#js引入"><span class="nav-text">js引入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基本配置"><span class="nav-text">基本配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#信息窗体配置"><span class="nav-text">信息窗体配置</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">China-ls</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lscn"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+</body>
+</html>

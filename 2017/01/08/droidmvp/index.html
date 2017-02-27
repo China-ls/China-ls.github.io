@@ -1,0 +1,974 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="安卓,MVP," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="China-ls" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本文核心内容
+MVP主要目的和实现方式：&amp;#160; &amp;#160; &amp;#160; &amp;#160;把业务逻辑抽象成Presenter层接口，把对视图的操作抽象成View接口，Presenter通过操作View来实现对视图的操作，View通过操作Presenter来实现对Model的操作和逻辑调用。&amp;#160; &amp;#160; &amp;#160; &amp;#160;实际操作中，以一个实体类实现Presenter接口，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈安卓MVP">
+<meta property="og:url" content="https://china-ls.github.io/2017/01/08/droidmvp/index.html">
+<meta property="og:site_name" content="China-ls">
+<meta property="og:description" content="本文核心内容
+MVP主要目的和实现方式：&amp;#160; &amp;#160; &amp;#160; &amp;#160;把业务逻辑抽象成Presenter层接口，把对视图的操作抽象成View接口，Presenter通过操作View来实现对视图的操作，View通过操作Presenter来实现对Model的操作和逻辑调用。&amp;#160; &amp;#160; &amp;#160; &amp;#160;实际操作中，以一个实体类实现Presenter接口，">
+<meta property="og:image" content="https://china-ls.github.io/assets/res/20170108/mvp_google_code_structure.png">
+<meta property="og:updated_time" content="2017-02-07T01:24:36.797Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="浅谈安卓MVP">
+<meta name="twitter:description" content="本文核心内容
+MVP主要目的和实现方式：&amp;#160; &amp;#160; &amp;#160; &amp;#160;把业务逻辑抽象成Presenter层接口，把对视图的操作抽象成View接口，Presenter通过操作View来实现对视图的操作，View通过操作Presenter来实现对Model的操作和逻辑调用。&amp;#160; &amp;#160; &amp;#160; &amp;#160;实际操作中，以一个实体类实现Presenter接口，">
+<meta name="twitter:image" content="https://china-ls.github.io/assets/res/20170108/mvp_google_code_structure.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '6372010932884735000',
+      author: 'China-ls'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"未查到响应的结果: ${query}","hits_stats":"${hits} 结果，用时 ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://china-ls.github.io/2017/01/08/droidmvp/"/>
+
+
+
+
+
+  <title> 浅谈安卓MVP | China-ls </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?06d15990b678b657d9584f0f598f80e0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">China-ls</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">科技改变世界，世界改变我们，我们推动科技变革。呀，是个循环呀，能否使用Break?</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://china-ls.github.io/2017/01/08/droidmvp/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="China-ls">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/assets/img/avatar.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="China-ls">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="China-ls" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                浅谈安卓MVP
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-08T17:30:56+08:00">
+                2017-01-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/理论/" itemprop="url" rel="index">
+                    <span itemprop="name">理论</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/01/08/droidmvp/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/01/08/droidmvp/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="本文核心内容"><a href="#本文核心内容" class="headerlink" title="本文核心内容"></a>本文核心内容</h3><blockquote>
+<p><strong>MVP主要目的和实现方式：</strong><br>&#160; &#160; &#160; &#160;<font color="#f40">把业务逻辑抽象成Presenter层接口，把对视图的操作抽象成View接口，Presenter通过操作View来实现对视图的操作，View通过操作Presenter来实现对Model的操作和逻辑调用。</font><br>&#160; &#160; &#160; &#160;<font color="#f40">实际操作中，以一个实体类实现Presenter接口，而Activity或者Fragment实现View接口，在Activity中实例化Presenter对象，并把自己传递给Presenter，然后互相调用，通过接口来代码解耦，并且可以针对接口进行单元测试。</font></p>
+</blockquote>
+<p><em>注：以上内容是本文核心内容，以下内容即是为了说明上面这段话，如果对MVP有一定了解的朋友，可以把省下时间去跟妹纸聊人生聊理想了。</em>(^_^)</p>
+<h3 id="MVP-是个什么概念？"><a href="#MVP-是个什么概念？" class="headerlink" title="MVP 是个什么概念？"></a>MVP 是个什么概念？</h3><p>&#160; &#160; &#160; &#160;最近有朋友问我说：”MVP使用那种方式好？”，对于这样的问题，其实我也是被问懵了。因为笔者并不理解为什么会有这样的疑问，在进行了进一步的沟通后，原来他是被网上各种博客和谷歌的参考实现给弄糊涂了，因为实现方式上有一定的差异，导致他不知道该怎么选择自己写代码的方式了。<br>&#160; &#160; &#160; &#160;对于这样的情况，我不禁会去想一个问题，MVP是个什么样的概念，为什么会让他产生了不知道该选择那种实现方式去写代码的想法。<br>&#160; &#160; &#160; &#160;其实仔细思索一下不难发现，他的问题不仅仅是因为谷歌的官方参考和别的作者的写法上的差异，而是他其实并没有真正的理解<strong>MVP是个什么样的东西</strong>。<br>&#160; &#160; &#160; &#160;在具体讨论MVP是什么东西之前，我们先看下百度百科对于 “MVP 模式” 的<a href="http://baike.baidu.com/subview/7294/10754979.htm#viewPageContent" target="_blank" rel="external">定义</a>：</p>
+<blockquote>
+<p>&#160; &#160; &#160; &#160;mvp的全称为Model-View-Presenter，Model提供数据，View负责显示，Controller/Presenter负责逻辑的处理。MVP与MVC有着一个重大的区别：在MVP中View并不直接使用Model，它们之间的通信是通过Presenter (MVC中的Controller)来进行的，所有的交互都发生在Presenter内部，而在MVC中View会直接从Model中读取数据而不是通过 Controller。</p>
+</blockquote>
+<p>&#160; &#160; &#160; &#160;做过开发的同学应该对MVC的Model View Controller这些概念有一定的了解，这里就不再赘述了，那我们这里来说说MVP与MVC的不同，简单来说就是<strong>使用Presenter来进行View和Model间的通信</strong>。那么这里我们先抛开其他的问题，先记住上面加黑字体的这句话。<br>&#160; &#160; &#160; &#160;我们做移动应用开发从创建一个项目，到设计界面，然后写代码直至项目运行起来的过程中，基本上都是将视图设计这一块挪到了代码外部放到一个单独的布局文件中这就是我们要讲的View(<em>包含不仅限于此</em>)，而我们在与服务器端程序通信的过程中，传递的数据对象，这里就是Model，那么我们的controller呢？在不使用任何设计模式的情况下，我们的Activity对象就是进行着Controller的工作。具体实现方式请看下面的例子。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">RelativeLayout</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></div><div class="line">    <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></div><div class="line">    <span class="attr">android:layout_height</span>=<span class="string">"match_parent"</span>&gt;</div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="name">TextView</span></span></div><div class="line">        <span class="attr">android:id</span>=<span class="string">"@+id/textView"</span></div><div class="line">        <span class="attr">android:layout_width</span>=<span class="string">"wrap_content"</span></div><div class="line">        <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span> /&gt;</div><div class="line"></div><div class="line"><span class="tag">&lt;/<span class="name">RelativeLayout</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SomeService</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">doSomeThing</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">"success"</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">Activity</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> SomeService someService;</div><div class="line">    <span class="keyword">private</span> TextView mTextView;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</div><div class="line">        setContentView(R.layout.main);</div><div class="line">        someService = <span class="keyword">new</span> SomeService();</div><div class="line">        mTextView = (TextView) findViewById(R.id.textView);</div><div class="line">        mTextView.setText(someService.doSomeThing());</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>&#160; &#160; &#160; &#160;到这里是不是很熟悉，基本上是我们使用IDE创建一个项目的时候自动生成的代码，但是又稍微有点不同的是，我们把需要设置到TextView上的内容，封装成了对象SomeService的一个方法，这样就更符合我们写项目时候的一些行为，因为我们在具体项目中，有些数据是从后台获取，然后展示到界面上。这个是基本mvc的使用方式，也就是安卓平台给我们提供的mvc。<br>&#160; &#160; &#160; &#160;接下来我们看下谷歌官方提供的<a href="https://github.com/googlesamples/android-architecture" target="_blank" rel="external">MVP参考实现</a>，官方实现中包含几种不同的版本(todo‑mvp|todo‑mvp‑rxjava|等等)，我们这里以最基本实现方式(不使用其他库的情况下实现)进行分析。在这里我们只讨论与MVP相关的内容。先上代码，等下解释，可以在看代码的同时，运行官方示例对照查看。<br><img src="/assets/res/20170108/mvp_google_code_structure.png" alt="谷歌MVP参考实现包结构"><br>&#160; &#160; &#160; &#160;简单说明下这些包的内容，data中是对实体类Model、获取Model的抽象层的封装与实现，与J2EE中DAO层的概念完全一致。谷歌这里是使用TasksDataSource将Task的CRUD等操作进行了一层抽象，TasksLocalDataSource提供了本地Sqlite的一个实现，TasksRemoteDataSource提供了一个内存LinkedHashMap的方式模拟服务器数据获取。通过TasksRepository持有TasksLocalDataSource和TasksRemoteDataSource，进行缓存控制，有兴趣的同学可以看下源码，具体奥妙之处还是真正看源码才能体会的到，这里就不展开讨论了。<br>&#160; &#160; &#160; &#160;util就是工具类的包，addedittask、statistics、taskdetail、tasks这些包，都是具体每个显示到用户面前界面的模块，每个包下面包含Activity、Fragment和具体Presenter的实现，这里针对tasks这个包下的内容来详细探讨，其他包中的内容大同小异，就不详细去讲了，具体可以看下源码。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//这是 所有Presenter的基本接口</span></div><div class="line"><span class="keyword">package</span> com.example.android.architecture.blueprints.todoapp;</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BasePresenter</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">start</span><span class="params">()</span></span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//这是 所有View的基本接口</span></div><div class="line"><span class="keyword">package</span> com.example.android.architecture.blueprints.todoapp;</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BaseView</span>&lt;<span class="title">T</span>&gt; </span>&#123;</div><div class="line">    <span class="comment">// 设置Presenter引用给View</span></div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setPresenter</span><span class="params">(T presenter)</span></span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//这是实体类对象，也就是我们说的Model</span></div><div class="line"><span class="keyword">package</span> com.example.android.architecture.blueprints.todoapp.data;</div><div class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Task</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String mId;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String mTitle;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String mDescription;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">boolean</span> mCompleted;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">package</span> com.example.android.architecture.blueprints.todoapp.tasks;</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">TasksContract</span> </span>&#123;</div><div class="line">    <span class="comment">// 这里是TaskActivity针对视图操作的抽象接口</span></div><div class="line">    <span class="class"><span class="keyword">interface</span> <span class="title">View</span> <span class="keyword">extends</span> <span class="title">BaseView</span>&lt;<span class="title">Presenter</span>&gt; </span>&#123;</div><div class="line">        <span class="comment">// 显示/隐藏 SwipeRefreshLayout 的刷新动画</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">setLoadingIndicator</span><span class="params">(<span class="keyword">boolean</span> active)</span></span>;</div><div class="line">        <span class="comment">// 显示 给定的Task</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">showTasks</span><span class="params">(List&lt;Task&gt; tasks)</span></span>;</div><div class="line">        <span class="comment">// 显示 添加Task 控件</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">showAddTask</span><span class="params">()</span></span>;</div><div class="line">        <span class="comment">// 显示 Task详情UI</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">showTaskDetailsUi</span><span class="params">(String taskId)</span></span>;</div><div class="line">        <span class="comment">// 标记Task已经完成</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">showTaskMarkedComplete</span><span class="params">()</span></span>;</div><div class="line">        <span class="comment">//标记 Task 活跃</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">showTaskMarkedActive</span><span class="params">()</span></span>;</div><div class="line">        <span class="comment">// 清除所有已经完成的Task</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">showCompletedTasksCleared</span><span class="params">()</span></span>;</div><div class="line">        <span class="comment">// 显示 加载 Task 错误</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">showLoadingTasksError</span><span class="params">()</span></span>;</div><div class="line">        <span class="comment">// 显示 未加载 到 Task</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">showNoTasks</span><span class="params">()</span></span>;</div><div class="line">        <span class="comment">//显示 活跃的 过滤器 标签</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">showActiveFilterLabel</span><span class="params">()</span></span>;</div><div class="line">        <span class="comment">//显示 已完成 过滤器 标签</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">showCompletedFilterLabel</span><span class="params">()</span></span>;</div><div class="line">        <span class="comment">//显示 所有 过滤器 标签</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">showAllFilterLabel</span><span class="params">()</span></span>;</div><div class="line">        <span class="comment">//显示 无活跃的Task</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">showNoActiveTasks</span><span class="params">()</span></span>;</div><div class="line">        <span class="comment">//显示 无已完成Task</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">showNoCompletedTasks</span><span class="params">()</span></span>;</div><div class="line">        <span class="comment">// 显示保存成功信息</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">showSuccessfullySavedMessage</span><span class="params">()</span></span>;</div><div class="line">        <span class="comment">//当前 Fragment的 active状态</span></div><div class="line">        <span class="function"><span class="keyword">boolean</span> <span class="title">isActive</span><span class="params">()</span></span>;</div><div class="line">        <span class="comment">// 显示 过滤器 PopupMenu</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">showFilteringPopUpMenu</span><span class="params">()</span></span>;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// 这里是TaskActivity针对Model操作的抽象接口</span></div><div class="line">    <span class="class"><span class="keyword">interface</span> <span class="title">Presenter</span> <span class="keyword">extends</span> <span class="title">BasePresenter</span> </span>&#123;</div><div class="line">        <span class="comment">// Activity Result 回调方法</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">result</span><span class="params">(<span class="keyword">int</span> requestCode, <span class="keyword">int</span> resultCode)</span></span>;</div><div class="line">        <span class="comment">// 加载Task</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">loadTasks</span><span class="params">(<span class="keyword">boolean</span> forceUpdate)</span></span>;</div><div class="line">        <span class="comment">// 添加Task</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">addNewTask</span><span class="params">()</span></span>;</div><div class="line">        <span class="comment">// 显示Task详情</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">openTaskDetails</span><span class="params">(Task requestedTask)</span></span>;</div><div class="line">        <span class="comment">// 将Task设置为完成状态</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">completeTask</span><span class="params">(Task completedTask)</span></span>;</div><div class="line">        <span class="comment">// 将Task设置为活跃状态</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">activateTask</span><span class="params">(Task activeTask)</span></span>;</div><div class="line">        <span class="comment">// 清空所有已经完成的Task</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">clearCompletedTasks</span><span class="params">()</span></span>;</div><div class="line">        <span class="comment">//设置当前过滤器类型</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">setFiltering</span><span class="params">(TasksFilterType requestType)</span></span>;</div><div class="line">        <span class="comment">//获取当前过滤器类型</span></div><div class="line">        <span class="function">TasksFilterType <span class="title">getFiltering</span><span class="params">()</span></span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>&#160; &#160; &#160; &#160;其实看到这里同学们应该发现了，我们先抛开所有的MVP等等概念，仅看这几个类的方法和名称，我们会发现几个特点：</p>
+<ul>
+<li>TasksContract.View 接口中封装的都是对视图(VIEW)的操作方法</li>
+<li>TasksContract.Presenter 接口中封装的都是对Model和逻辑的操作方法</li>
+<li>BaseView中封装了setPresenter方法，使VIEW获取Presenter引用<br><span id="a1"></span></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//TasksActivity </span></div><div class="line"><span class="keyword">package</span> com.example.android.architecture.blueprints.todoapp.tasks;</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TasksActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</div><div class="line">    <span class="comment">// 具体Task界面使用到的Presenter</span></div><div class="line">    <span class="comment">// ① 同时请大家思考下，为什么这里使用的是TasksPresenter对象，而不是BaseView接口</span></div><div class="line">    <span class="keyword">private</span> TasksPresenter mTasksPresenter;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</div><div class="line">        setContentView(R.layout.tasks_act);</div><div class="line">        <span class="comment">// Set up the toolbar.</span></div><div class="line">        <span class="comment">//略过代码中的视图设置</span></div><div class="line">        <span class="comment">// Set up the navigation drawer.</span></div><div class="line"></div><div class="line">        <span class="comment">// 从布局获取 Fragment，并强转为TasksFragment</span></div><div class="line">        TasksFragment tasksFragment = </div><div class="line">            (TasksFragment) getSupportFragmentManager()</div><div class="line">            .findFragmentById(R.id.contentFrame);</div><div class="line">        <span class="keyword">if</span> (tasksFragment == <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="comment">// 创建TasksFragment</span></div><div class="line">            tasksFragment = TasksFragment.newInstance();</div><div class="line">            <span class="comment">//吧TasksFragment 添加到当前的界面上</span></div><div class="line">            ActivityUtils.addFragmentToActivity(</div><div class="line">                    getSupportFragmentManager(), tasksFragment, </div><div class="line">                    R.id.contentFrame);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// 创建 presenter</span></div><div class="line">        mTasksPresenter = <span class="keyword">new</span> TasksPresenter(</div><div class="line">                <span class="comment">// 这里就是刚才说到的Task的CRUD封装对象</span></div><div class="line">                Injection.provideTasksRepository(getApplicationContext()), </div><div class="line">                tasksFragment);</div><div class="line"></div><div class="line">        <span class="comment">// Load previously saved state, if available.</span></div><div class="line">        <span class="keyword">if</span> (savedInstanceState != <span class="keyword">null</span>) &#123;</div><div class="line">            TasksFilterType currentFiltering = </div><div class="line">                (TasksFilterType) savedInstanceState</div><div class="line">                .getSerializable(CURRENT_FILTERING_KEY);</div><div class="line">            <span class="comment">// 这里是调用了 TasksPresenter 的设置 过滤器 方法</span></div><div class="line">            mTasksPresenter.setFiltering(currentFiltering);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>&#160; &#160; &#160; &#160;TasksActivity 做的事情比较简单：</p>
+<ul>
+<li>创建视图</li>
+<li>创建 TasksFragment，TasksFragment实现TasksContract.View接口</li>
+<li>实例化 TasksPresenter ，TasksPresenter实现TasksContract.Presenter接口</li>
+<li>调用 TasksPresenter 的 setFiltering方法，这是目前看到一次对Presenter的使用<br><span id="a2"></span><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.example.android.architecture.blueprints.todoapp.tasks;</div><div class="line"><span class="comment">// 实现了TasksContract.View 接口的对象，在这里可以看到具体对Presenter的操作</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TasksFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> <span class="keyword">implements</span> <span class="title">TasksContract</span>.<span class="title">View</span> </span>&#123;</div><div class="line">    <span class="comment">// ② 请大家思考下，这里为什么使用的是 TasksContract.Presenter 而不是 TasksPresenter？</span></div><div class="line">    <span class="keyword">private</span> TasksContract.Presenter mPresenter;</div><div class="line">    </div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onResume</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onResume();</div><div class="line">        <span class="comment">// 调用 TasksPresenter的start方法   1</span></div><div class="line">        mPresenter.start();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPresenter</span><span class="params">(@NonNull TasksContract.Presenter presenter)</span> </span>&#123;</div><div class="line">        <span class="comment">// 设置 TasksPresenter对象   2</span></div><div class="line">        mPresenter = checkNotNull(presenter);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onActivityResult</span><span class="params">(<span class="keyword">int</span> requestCode, <span class="keyword">int</span> resultCode, Intent data)</span> </span>&#123;</div><div class="line">        <span class="comment">// 调用 TasksPresenter的result方法   3</span></div><div class="line">        mPresenter.result(requestCode, resultCode);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Nullable</span></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> View <span class="title">onCreateView</span><span class="params">(LayoutInflater inflater, ViewGroup container,</span></span></div><div class="line">                             Bundle savedInstanceState) &#123;</div><div class="line">        <span class="comment">// 省略具体创建 UI 视图的过程</span></div><div class="line"></div><div class="line">        <span class="comment">// Set up floating action button</span></div><div class="line">        FloatingActionButton fab =</div><div class="line">                (FloatingActionButton) getActivity().findViewById(R.id.fab_add_task);</div><div class="line"></div><div class="line">        fab.setImageResource(R.drawable.ic_add);</div><div class="line">        fab.setOnClickListener(<span class="keyword">new</span> View.OnClickListener() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</div><div class="line">                <span class="comment">// 调用 TasksPresenter的addNewTask方法   4</span></div><div class="line">                mPresenter.addNewTask();</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">        swipeRefreshLayout.setOnRefreshListener(<span class="keyword">new</span> SwipeRefreshLayout.OnRefreshListener() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onRefresh</span><span class="params">()</span> </span>&#123;</div><div class="line">                <span class="comment">// 调用 TasksPresenter的 loadTasks 方法   5</span></div><div class="line">                mPresenter.loadTasks(<span class="keyword">false</span>);</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">        <span class="keyword">return</span> root;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onOptionsItemSelected</span><span class="params">(MenuItem item)</span> </span>&#123;</div><div class="line">        <span class="keyword">switch</span> (item.getItemId()) &#123;</div><div class="line">            <span class="keyword">case</span> R.id.menu_clear:</div><div class="line">                <span class="comment">// 调用 TasksPresenter的 clearCompletedTasks 方法   6</span></div><div class="line">                mPresenter.clearCompletedTasks();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">case</span> R.id.menu_filter:</div><div class="line">                showFilteringPopUpMenu();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">case</span> R.id.menu_refresh:</div><div class="line">                <span class="comment">// 调用 TasksPresenter的 loadTasks 方法   7</span></div><div class="line">                mPresenter.loadTasks(<span class="keyword">true</span>);</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">showFilteringPopUpMenu</span><span class="params">()</span> </span>&#123;</div><div class="line">        PopupMenu popup = <span class="keyword">new</span> PopupMenu(getContext(), getActivity().findViewById(R.id.menu_filter));</div><div class="line">        popup.getMenuInflater().inflate(R.menu.filter_tasks, popup.getMenu());</div><div class="line"></div><div class="line">        popup.setOnMenuItemClickListener(<span class="keyword">new</span> PopupMenu.OnMenuItemClickListener() &#123;</div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onMenuItemClick</span><span class="params">(MenuItem item)</span> </span>&#123;</div><div class="line">                <span class="keyword">switch</span> (item.getItemId()) &#123;</div><div class="line">                    <span class="keyword">case</span> R.id.active:</div><div class="line">                        <span class="comment">// 调用 TasksPresenter的 loadTasks 方法   8</span></div><div class="line">                        mPresenter.setFiltering(TasksFilterType.ACTIVE_TASKS);</div><div class="line">                        <span class="keyword">break</span>;</div><div class="line">                    <span class="keyword">case</span> R.id.completed:</div><div class="line">                        <span class="comment">// 调用 TasksPresenter的 loadTasks 方法   9</span></div><div class="line">                        mPresenter.setFiltering(TasksFilterType.COMPLETED_TASKS);</div><div class="line">                        <span class="keyword">break</span>;</div><div class="line">                    <span class="keyword">default</span>:</div><div class="line">                        <span class="comment">// 调用 TasksPresenter的 loadTasks 方法   10</span></div><div class="line">                        mPresenter.setFiltering(TasksFilterType.ALL_TASKS);</div><div class="line">                        <span class="keyword">break</span>;</div><div class="line">                &#125;</div><div class="line">                <span class="comment">// 调用 TasksPresenter的 loadTasks 方法   11</span></div><div class="line">                mPresenter.loadTasks(<span class="keyword">false</span>);</div><div class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line"></div><div class="line">        popup.show();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Listener for clicks on tasks in the ListView.</div><div class="line">     */</div><div class="line">    TaskItemListener mItemListener = <span class="keyword">new</span> TaskItemListener() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onTaskClick</span><span class="params">(Task clickedTask)</span> </span>&#123;</div><div class="line">            <span class="comment">// 调用 TasksPresenter的 loadTasks 方法   12</span></div><div class="line">            mPresenter.openTaskDetails(clickedTask);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCompleteTaskClick</span><span class="params">(Task completedTask)</span> </span>&#123;</div><div class="line">            <span class="comment">// 调用 TasksPresenter的 loadTasks 方法   13</span></div><div class="line">            mPresenter.completeTask(completedTask);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onActivateTaskClick</span><span class="params">(Task activatedTask)</span> </span>&#123;</div><div class="line">            <span class="comment">// 调用 TasksPresenter的 loadTasks 方法   14</span></div><div class="line">            mPresenter.activateTask(activatedTask);</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>&#160; &#160; &#160; &#160;上面是 TasksFragment 一部分相关内容，我们简单看下就可以发现：</p>
+<ul>
+<li>生成基本视图</li>
+<li>对 TasksPresenter 的调用相对比较多</li>
+<li>把 TasksPresenter 当(就)作(是)一个普通对象来操作<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.example.android.architecture.blueprints.todoapp.tasks;</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TasksPresenter</span> <span class="keyword">implements</span> <span class="title">TasksContract</span>.<span class="title">Presenter</span> </span>&#123;</div><div class="line">    <span class="comment">// 数据CRUD 操作</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> TasksRepository mTasksRepository;</div><div class="line">    <span class="comment">// View 对象</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> TasksContract.View mTasksView;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TasksPresenter</span><span class="params">(@NonNull TasksRepository tasksRepository, @NonNull TasksContract.View tasksView)</span> </span>&#123;</div><div class="line">        mTasksRepository = checkNotNull(tasksRepository, <span class="string">"tasksRepository cannot be null"</span>);</div><div class="line">        <span class="comment">// 保存View的引用</span></div><div class="line">        mTasksView = checkNotNull(tasksView, <span class="string">"tasksView cannot be null!"</span>);</div><div class="line">        <span class="comment">// 把自己的引用设置给View</span></div><div class="line">        mTasksView.setPresenter(<span class="keyword">this</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">result</span><span class="params">(<span class="keyword">int</span> requestCode, <span class="keyword">int</span> resultCode)</span> </span>&#123;</div><div class="line">        <span class="comment">// If a task was successfully added, show snackbar</span></div><div class="line">        <span class="keyword">if</span> (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode &amp;&amp; Activity.RESULT_OK == resultCode) &#123;</div><div class="line">            <span class="comment">// 操作View</span></div><div class="line">            mTasksView.showSuccessfullySavedMessage();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">loadTasks</span><span class="params">(<span class="keyword">boolean</span> forceUpdate, <span class="keyword">final</span> <span class="keyword">boolean</span> showLoadingUI)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (showLoadingUI) &#123;</div><div class="line">            <span class="comment">// 操作View</span></div><div class="line">            mTasksView.setLoadingIndicator(<span class="keyword">true</span>);</div><div class="line">        &#125;</div><div class="line">        <span class="comment">// ... 省略其他无关代码</span></div><div class="line">        mTasksRepository.getTasks(<span class="keyword">new</span> TasksDataSource.LoadTasksCallback() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onTasksLoaded</span><span class="params">(List&lt;Task&gt; tasks)</span> </span>&#123;</div><div class="line">                <span class="comment">// ... 省略其他无关代码</span></div><div class="line">                <span class="keyword">if</span> (showLoadingUI) &#123;</div><div class="line">                    <span class="comment">// 操作View</span></div><div class="line">                    mTasksView.setLoadingIndicator(<span class="keyword">false</span>);</div><div class="line">                &#125;</div><div class="line">                <span class="comment">// ... 省略其他无关代码</span></div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDataNotAvailable</span><span class="params">()</span> </span>&#123;</div><div class="line">                <span class="comment">// The view may not be able to handle UI updates anymore</span></div><div class="line">                <span class="comment">// 操作View</span></div><div class="line">                <span class="keyword">if</span> (!mTasksView.isActive()) &#123;</div><div class="line">                    <span class="keyword">return</span>;</div><div class="line">                &#125;</div><div class="line">                <span class="comment">// 操作View</span></div><div class="line">                mTasksView.showLoadingTasksError();</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">processTasks</span><span class="params">(List&lt;Task&gt; tasks)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (tasks.isEmpty()) &#123;</div><div class="line">            <span class="comment">// Show a message indicating there are no tasks for that filter type.</span></div><div class="line">            processEmptyTasks();</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="comment">// 操作View</span></div><div class="line">            mTasksView.showTasks(tasks);</div><div class="line">            <span class="comment">// Set the filter label's text.</span></div><div class="line">            showFilterLabel();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">showFilterLabel</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">switch</span> (mCurrentFiltering) &#123;</div><div class="line">            <span class="keyword">case</span> ACTIVE_TASKS:</div><div class="line">                <span class="comment">// 操作View</span></div><div class="line">                mTasksView.showActiveFilterLabel();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">case</span> COMPLETED_TASKS:</div><div class="line">                <span class="comment">// 操作View</span></div><div class="line">                mTasksView.showCompletedFilterLabel();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">default</span>:</div><div class="line">                <span class="comment">// 操作View</span></div><div class="line">                mTasksView.showAllFilterLabel();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">processEmptyTasks</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">switch</span> (mCurrentFiltering) &#123;</div><div class="line">            <span class="keyword">case</span> ACTIVE_TASKS:</div><div class="line">                <span class="comment">// 操作View</span></div><div class="line">                mTasksView.showNoActiveTasks();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">case</span> COMPLETED_TASKS:</div><div class="line">                <span class="comment">// 操作View</span></div><div class="line">                mTasksView.showNoCompletedTasks();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">default</span>:</div><div class="line">                <span class="comment">// 操作View</span></div><div class="line">                mTasksView.showNoTasks();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addNewTask</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">// 操作View</span></div><div class="line">        mTasksView.showAddTask();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">openTaskDetails</span><span class="params">(@NonNull Task requestedTask)</span> </span>&#123;</div><div class="line">        checkNotNull(requestedTask, <span class="string">"requestedTask cannot be null!"</span>);</div><div class="line">        <span class="comment">// 操作View</span></div><div class="line">        mTasksView.showTaskDetailsUi(requestedTask.getId());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">completeTask</span><span class="params">(@NonNull Task completedTask)</span> </span>&#123;</div><div class="line">        checkNotNull(completedTask, <span class="string">"completedTask cannot be null!"</span>);</div><div class="line">        mTasksRepository.completeTask(completedTask);</div><div class="line">        <span class="comment">// 操作View</span></div><div class="line">        mTasksView.showTaskMarkedComplete();</div><div class="line">        loadTasks(<span class="keyword">false</span>, <span class="keyword">false</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">activateTask</span><span class="params">(@NonNull Task activeTask)</span> </span>&#123;</div><div class="line">        checkNotNull(activeTask, <span class="string">"activeTask cannot be null!"</span>);</div><div class="line">        mTasksRepository.activateTask(activeTask);</div><div class="line">        <span class="comment">// 操作View</span></div><div class="line">        mTasksView.showTaskMarkedActive();</div><div class="line">        loadTasks(<span class="keyword">false</span>, <span class="keyword">false</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">clearCompletedTasks</span><span class="params">()</span> </span>&#123;</div><div class="line">        mTasksRepository.clearCompletedTasks();</div><div class="line">        <span class="comment">// 操作View</span></div><div class="line">        mTasksView.showCompletedTasksCleared();</div><div class="line">        loadTasks(<span class="keyword">false</span>, <span class="keyword">false</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>上面是 TasksPresenter 的部分相关内容，我们简单看下就可以发现：</p>
+<ul>
+<li>内部保留了TasksContract.View的引用，用来操作视图</li>
+<li>对视图的操作，都是直接调用View的引用</li>
+<li>操作视图时候，并不考虑在哪个线程中操作(<strong>这里就是比较重要的，那么我们后台线程如果操作UI线程怎么办呢？实际上，这里并不需要后台线程去考虑这个问题，因为真正去操作UI的还是View，所以应该由View去控制</strong>)</li>
+</ul>
+<h3 id="强化对于MVP的理解"><a href="#强化对于MVP的理解" class="headerlink" title="强化对于MVP的理解"></a>强化对于MVP的理解</h3><p>&#160; &#160; &#160; &#160;其实，MVP总体来说就是这个思想，毕竟MVP是个模式，你如何使用是具体的实现方式。我们再来强化下对于MVP的理解：</p>
+<ul>
+<li>MVP是个模式，并不是某个具体实现，其本质是面向接口编程</li>
+<li>业务逻辑方法抽象成接口Presenter</li>
+<li>视图操作方法抽象成接口View</li>
+<li>View和Presenter互相保存引用，在View中通过调用Presenter方法操作业务逻辑，在Presenter中调用View方法操作视图</li>
+</ul>
+<h3 id="对于①②解释："><a href="#对于①②解释：" class="headerlink" title="对于①②解释："></a><font color="#f40">对于①②解释：</font></h3><ul>
+<li>对于<a href="#a1">①</a>，这里是把TasksContract.Presenter进行实例化的地方，其实是已经很明确知道需要使用到的Presenter对象的类型了，所以直接使用实体类就可以了。因为当你切换到不同的Presenter时候，依然是需要修改这里的代码的。</li>
+<li>对于<a href="#a2">②</a>，这里是视图对逻辑引用的保存，但是这里其实是并不清楚具体逻辑的实现，针对接口编程当然最好啦，当你替换下不同的实现，并不需要修改这里的代码。        </li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>如果您觉得这篇文章帮助了您，并且值得打赏的话，请鼓励一下，谢谢！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="/assets/img/wx.jpg" alt="China-ls WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="/assets/img/alipay.png" alt="China-ls Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/安卓/" rel="tag"># 安卓</a>
+          
+            <a href="/tags/MVP/" rel="tag"># MVP</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/19/alipaycard2017/" rel="prev" title="支付宝福卡增强卡">
+                支付宝福卡增强卡 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2017/01/08/droidmvp/"
+     data-title="浅谈安卓MVP"
+     data-content=""
+     data-url="https://china-ls.github.io/2017/01/08/droidmvp/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/01/08/droidmvp/"
+           data-title="浅谈安卓MVP" data-url="https://china-ls.github.io/2017/01/08/droidmvp/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/assets/img/avatar.jpg"
+               alt="China-ls" />
+          <p class="site-author-name" itemprop="name">China-ls</p>
+          <p class="site-description motion-element" itemprop="description">欢迎关注，不断更新中。</p>
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/China-ls" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#本文核心内容"><span class="nav-text">本文核心内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MVP-是个什么概念？"><span class="nav-text">MVP 是个什么概念？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#强化对于MVP的理解"><span class="nav-text">强化对于MVP的理解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对于①②解释："><span class="nav-text">对于①②解释：</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">China-ls</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lscn"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+</body>
+</html>
