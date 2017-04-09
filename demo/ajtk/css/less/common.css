@@ -1,0 +1,91 @@
+body {
+  min-width: 1200px;
+}
+.nav-stacked > li + li {
+  margin-top: 0;
+}
+.nav-pills > li.active > a {
+  background-color: #F5C400;
+}
+.nav-pills > li.active > a:hover,
+.nav-pills > li.active > a:focus {
+  background-color: #F5C400;
+}
+.nav-pills > li > a {
+  border-radius: 0;
+  background-color: #E2E2E2;
+  height: 42px;
+  color: #555;
+  font-size: 14px;
+  padding-left: 30px;
+}
+.page-menu {
+  width: 217px;
+}
+.page-menu .page-title {
+  background: #00d1f7;
+  height: 73px;
+  color: #fff;
+  font-size: 12px;
+  overflow: hidden;
+}
+.page-menu .page-title .cn {
+  display: block;
+  font-size: 20px;
+  font-weight: bold;
+  padding-top: 20px;
+}
+.page-menu.nav > li > a:hover,
+.page-menu.nav > li > a:focus {
+  text-decoration: none;
+  color: #fff;
+  background-color: #F5C400;
+}
+.cm-footer {
+  background-color: #292929;
+}
+.cm-footer .site-map {
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+.cm-footer .site-map .bb000 {
+  text-align: left;
+  padding-bottom: 0;
+  margin: 0 auto;
+  width: 920px;
+  display: block;
+  letter-spacing: 1px;
+}
+.cm-footer .site-map .bb001 {
+  padding-left: 40px;
+  min-width: 170px;
+  display: block;
+  float: left;
+  height: 180px;
+  font-size: 12px;
+  border-right: #565656 1px dotted;
+}
+.cm-footer .site-map .bb002 A {
+  line-height: 18px;
+  margin-top: 0;
+  display: block;
+  margin-bottom: 15px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: normal;
+}
+.cm-footer .site-map .bb003 A {
+  line-height: 24px;
+  color: #ccc;
+  font-size: 12px;
+}
+.cm-copyright {
+  background: #1a1a1a;
+  height: 76px;
+}
+.cm-copyright .copyright {
+  text-align: left;
+  line-height: 70px;
+  color: #929292;
+  font-size: 12px;
+}
